@@ -12,6 +12,7 @@ from typing import Annotated
 
 from app.services.llm_factory import LLMFactory
 from app.utils.image_utils import ImageUtils
+from app.utils.prompt_utils import PromptUtils
 
 app = FastAPI()
 
@@ -57,8 +58,8 @@ async def change_outfit(data: Annotated[_schema.ChangeOutfitRequest, Form()]) ->
     response_json = json.loads(response_str)
 
     prompt = response_json["prompt"]
-    final_prompt = f'((masterpiece)), (extremely intricate:1.2), (realistic:0.5), (digital painting:1), ({style.lower()}:1.3), {prompt}, <lora:more_details:0.3>, (high detail:1.1), (detailed face:1.2), (perfect composition:1.4)'
-    negative_prompt = "nsfw, not safe for work, BadDream, (UnrealisticDream:1.2), blurry, text, watermark, lowres"
+    final_prompt = PromptUtils.refine_prompt_for_dreamshaper(prompt, style=style)
+    negative_prompt = f"nsfw, not safe for work, {PromptUtils.get_negative_prompt_for_dreamshaper()}"
 
     # img2img args
     controlnet_openpose_args = {
@@ -77,25 +78,6 @@ async def change_outfit(data: Annotated[_schema.ChangeOutfitRequest, Form()]) ->
         controlnet_args=[controlnet_openpose_args],
         roop_enabled=True
     )
-    
-    # txt2img args
-    # controlnet_openpose_args = {
-    #     "enabled": True,
-    #     "image": base64_image,
-    #     "module": "openpose_full",
-    #     "model": "control_v11p_sd15_openpose [cab727d4]",
-    #     "control_mode": "Balanced"
-    # }
-    
-    # response = stable_diff_service.generate_txt2img(
-    #     base64_image=base64_image,
-    #     width=960,
-    #     height=1416,
-    #     prompt=final_prompt,
-    #     negative_prompt=negative_prompt,
-    #     controlnet_args=[controlnet_openpose_args],
-    #     roop_enabled=True
-    # )
 
     return _schema.ChangeOutfitResponse(
         status_code=200,
