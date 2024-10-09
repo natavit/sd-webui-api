@@ -5,7 +5,7 @@ from PIL import Image
 import requests
 import json
 
-from app.constants.main import DESCRIBE_STYLE_RESPONSE_SCHEMA, GEMINI_MODEL_NAME, LOCATION, PROJECT_ID, PROMPT_TO_DESCRIBE_STYLE, ROOP_MODEL_PATH, SD_API_URL
+from app.constants.main import DESCRIBE_STYLE_RESPONSE_SCHEMA, GEMINI_MODEL_NAME, IMAGE_MAX_HEIGHT, IMAGE_MAX_WIDTH, LOCATION, PROJECT_ID, PROMPT_TO_DESCRIBE_STYLE, ROOP_MODEL_PATH, SD_API_URL
 import app.schema as _schema
 
 from typing import Annotated
@@ -42,7 +42,7 @@ async def change_outfit(data: Annotated[_schema.ChangeOutfitRequest, Form()]) ->
     mimetype = pil_image.get_format_mimetype()
     # width, height = pil_image.size
     
-    new_width, new_height = ImageUtils.calculate_resized_dimensions(pil_image, 1416, 960)
+    new_width, new_height = ImageUtils.calculate_resized_dimensions(pil_image, IMAGE_MAX_HEIGHT, IMAGE_MAX_WIDTH)
     
     base64_image = base64.b64encode(image_bytes).decode('utf-8')
 

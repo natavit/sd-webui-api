@@ -31,3 +31,6 @@ DESCRIBE_STYLE_RESPONSE_SCHEMA = {
     },
     "required": ["prompt"],
 }
+
+IMAGE_MAX_WIDTH = 960
+IMAGE_MAX_HEIGHT = 1416
