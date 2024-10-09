@@ -1,6 +1,7 @@
 # stable-diffusion-controlnet-webapi
 
 ## Required Environment Variables
+
 - `PROJECT_ID` - Google Cloud Project ID
 - `LOCATION` - Google Cloud Region (e.g. us-central1, asia-southeast1, etc.)
 - `GEMINI_MODEL_NAME` - Gemini Model Name (e.g. gemini-1.5-flash-002)
@@ -17,3 +18,6 @@ EXPORT SD_API_URL="SD_API_URL"
 EXPORT SD_MODEL_CHECKPOINT="SD_MODEL_CHECKPOINT"
 ```
 
+## API Docs
+
+FastAPI provides Swagger Docs that can be accessed via `/docs`
