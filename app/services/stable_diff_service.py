@@ -33,22 +33,23 @@ class StableDiffusionService:
         controlnet_args: List[Dict[str, any]],
         roop_enabled: bool
     ) -> Txt2ImgResponse:
+        
+        # Specific config for dreamshaperXL_v2TurboDPMSDE
         payload = {
             "prompt": prompt,
             "negative_prompt": negative_prompt,
-            "sampler_name": "DPM++ 2M",
-            "scheduler": "karras",
+            "sampler_name": "DPM++ SDE",
+            "scheduler": "Karras",
             "seed": -1,
-            "steps": 20,
-            "cfg_scale": 7,
+            "steps": 6,
+            "cfg_scale": 2,
             "resize_mode": 0,
             "width": width,
             "height": height,
             "restore_faces": True,
             "save_images": True,
             "override_settings": {
-                # "sd_model_checkpoint": "3dAnimationDiffusion_v10"
-                "sd_model_checkpoint": SD_MODEL_CHECKPOINT
+                "sd_model_checkpoint": "dreamshaperXL_v2TurboDPMSDE"
             },
             "alwayson_scripts": {}
         }
@@ -73,7 +74,9 @@ class StableDiffusionService:
             timeout=60
         )
         
-        return Txt2ImgResponse.from_dict(response.json())
+        response_js = response.json()
+        
+        return Txt2ImgResponse.from_dict(response_js)
 
     def generate_img2img(
         self,

@@ -9,17 +9,13 @@ SD_API_URL = os.environ.get("SD_API_URL")
 SD_MODEL_CHECKPOINT = os.environ.get("SD_MODEL_CHECKPOINT", "dreamshaper_8")
 
 PROMPT_TO_DESCRIBE_STYLE = """**Instructions**
-You are an expert Stable Diffusion prompt designer. You are tasked to design a prompt that will be used with the Stable Diffusion-based DreamShaper model to change the outfit of the person in the given picture.
-**Requirements**
-1. The prompt should state if the person is a man or woman.
-2. The prompt should instruct to change the outfit into {outfit_style}.
-2.1 If the outfit is a dress, the prompt should also mention the length of the dress.
-2.2 If the outfit contains a risk to copy right issues, the prompt should mention that the outfit is a "concept" or "inspired by".
-3. The prompt should pay close attention and describe facial expression and body characteristics of the person in the input image.
-4. The prompt should not state the current outfit of the person in the input image.
-5. The prompt should instruct lighting and background image to be blurry, but relevant to the new outfit.
-
-Finally, output into a valid JSON with "prompt".
+Create a prompt that will be used with a Stable Diffusion-based model with the following requirements:
+- The prompt should state if the person is a man or woman.
+- The prompt should pay close attention and describe facial expression and body characteristics of the person in the input image.
+- The prompt should not state the current outfit of the person in the input image.
+- The prompt should not state the current posture of the person.
+- The prompt should be descriptive and include the person details and no need a full stop at the ending.
+- Finally, output into a valid JSON with "prompt" field
 """
 
 DESCRIBE_STYLE_RESPONSE_SCHEMA = {

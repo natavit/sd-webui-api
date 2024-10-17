@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Form
+from fastapi.middleware.cors import CORSMiddleware
 import io
 import base64
 from PIL import Image
@@ -15,6 +16,14 @@ from app.utils.image_utils import ImageUtils
 from app.utils.prompt_utils import PromptUtils
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 google_vertex_service = LLMFactory.get_gemini_client(
     PROJECT_ID,
@@ -36,7 +45,7 @@ def read_root():
 
 
 @app.post("/api/v1/change-outfit")
-async def change_outfit(data: Annotated[_schema.ChangeOutfitRequest, Form()]) -> _schema.ChangeOutfitResponse:
+async def generate_avatar(data: Annotated[_schema.ChangeOutfitRequest, Form()]) -> _schema.ChangeOutfitResponse:
     image_bytes = await data.ref_image.read()
     pil_image = Image.open(io.BytesIO(image_bytes))
     mimetype = pil_image.get_format_mimetype()
@@ -58,18 +67,19 @@ async def change_outfit(data: Annotated[_schema.ChangeOutfitRequest, Form()]) ->
     response_json = json.loads(response_str)
 
     prompt = response_json["prompt"]
-    final_prompt = PromptUtils.refine_prompt_for_dreamshaper(prompt, style=style)
-    negative_prompt = f"nsfw, not safe for work, {PromptUtils.get_negative_prompt_for_dreamshaper()}"
+    final_prompt = PromptUtils.create_sd_prompt(prompt, style=style)
+    negative_prompt = PromptUtils.get_sd_negative_prompt()
 
-    # img2img args
+    # txt2img args
     controlnet_openpose_args = {
         "enabled": True,
         "module": "openpose_full",
-        "model": "control_v11p_sd15_openpose [cab727d4]",
+        "image": base64_image,
+        "model": "diffusion_xl_openpose [d0333a45]",
         "control_mode": "Balanced"
     }
 
-    response = stable_diff_service.generate_img2img(
+    response = stable_diff_service.generate_txt2img(
         base64_image=base64_image,
         width=new_width,
         height=new_height,
@@ -82,7 +92,5 @@ async def change_outfit(data: Annotated[_schema.ChangeOutfitRequest, Form()]) ->
     return _schema.ChangeOutfitResponse(
         status_code=200,
         status="success",
-        data={
-            "images": [response.images[0]]
-        }
+        data=_schema.ChangeOutfitImageData([response.images[0]])
     )
